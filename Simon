@@ -1,0 +1,243 @@
+#El famoso juego de recordar secuencias de Simon en versión arduino
+#-----Hecho por Daniel6jas-----
+
+int p, s, t, c, q; #Estas variables hacen referencia a primero, segundo ... quinto
+int pp = 0, ps = 0, pt = 0, pc = 0, pq = 0; #primero pulsar, segundo pulsar ... quinto pulsar
+int TiempoEspera = 1000;
+int puntuacion = 0;
+int ronda = 1;
+int tiempoPre = 0;
+int tiempoPost = 0;
+int tiempoRonda = 0;
+void setup() {
+  pinMode(2, INPUT_PULLUP); // 2 <-> 8
+  pinMode(3, INPUT_PULLUP); // 3 <-> 9
+  pinMode(4, INPUT_PULLUP); // 4 <-> 10
+  pinMode(5, INPUT_PULLUP); // 5 <-> 11
+  pinMode(6, INPUT_PULLUP); // 6 <-> 12
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  //probarLuces();
+
+  inicializarVariables();
+  darValorLuces();
+  encenderLed(p);
+  encenderLed(s);
+  encenderLed(t);
+  encenderLed(c);
+  encenderLed(q);
+  tiempoPre = millis();
+  while (pp == 0 || ps == 0 || pt == 0 || pc == 0 || pq == 0) {
+    pulsarBotones();
+  }
+  delay(50);
+  tiempoPost = millis();
+  tiempoRonda = (tiempoPost - tiempoPre)/1000;
+
+  // VER SI HA GANADO O PERDIDO
+  if ((pp + 6) == p && (ps + 6) == s && (pt + 6) == t && (pc + 6) == c && (pq + 6) == q) {
+    Serial.println("Has ganado");
+    puntuacion = puntuacion + (100 + 10 * ronda - tiempoRonda );
+    Serial.println(puntuacion);
+  }
+  else {
+    Serial.print("Has perdido. Tu puntuacion ha sido: ");
+    Serial.print(puntuacion);
+  }
+  ronda++;
+  delay(1000);
+}
+
+
+void probarLuces() {
+
+  if (digitalRead(2) == LOW) {
+    while (digitalRead(2) == LOW) {
+      digitalWrite(8, HIGH);
+      digitalWrite(8, LOW);
+    }
+  }
+  if (digitalRead(3) == LOW) {
+    while (digitalRead(3) == LOW) {
+      digitalWrite(9, HIGH);
+      digitalWrite(9, LOW);
+    }
+  }
+  if (digitalRead(4) == LOW) {
+    while (digitalRead(4) == LOW) {
+      digitalWrite(10, HIGH);
+      digitalWrite(10, LOW);
+    }
+  }
+  if (digitalRead(5) == LOW) {
+    while (digitalRead(5) == LOW) {
+      digitalWrite(11, HIGH);
+      digitalWrite(11, LOW);
+    }
+  }
+  if (digitalRead(6) == LOW) {
+    while (digitalRead(6) == LOW) {
+      digitalWrite(12, HIGH);
+      digitalWrite(12, LOW);
+    }
+  }
+}
+void darValorLuces () {
+  randomSeed(analogRead(A4));
+
+  p = ( random(0, 5) + 8 ); // DA VALOR A LA PRIMERA LUZ
+  s = ( random(0, 5) + 8 ); // DA VALOR A LA SEGUNDA LUZ
+  while (p == s) {     // COMPRUEBA QUE LA PRIMERA Y LA SEGUNDA LUZ NO SEAN LA MISMA
+    s = ( random(0, 5) + 8 );
+  }
+  t = ( random(0, 5) + 8 ); // DA VALOR A LA TERCERA LUZ
+  while (p == t || s == t) {     // COMPRUEBA QUE LA TERCERA Y 1º O 2º LUZ NO SEAN LA MISMA
+    t = ( random(0, 5) + 8 );
+  }
+  c = ( random(0, 5) + 8 ); // DA VALOR A LA CUARTA LUZ
+  while (p == c || s == c || t == c) {
+    c = ( random(0, 5) + 8 );
+  }
+  q = ( random(0, 5) + 8);
+  while (p == q || s == q || t == q || c == q) {
+    q = (random(0, 5) + 8);
+  }
+}
+void encenderLed(int i) {
+  digitalWrite(i, HIGH);
+  delay(TiempoEspera);
+  digitalWrite(i, LOW);
+  delay(TiempoEspera / 2);
+}
+
+void pulsarBotones() {
+  if (digitalRead(2) == LOW) {
+    while (digitalRead(2) == LOW) {
+      digitalWrite(8, HIGH);
+      digitalWrite(8, LOW);
+    }
+    if (pp == 0) {
+      pp = 2;
+    }
+    else if (ps == 0) {
+      ps = 2;
+    }
+    else if (pt == 0) {
+      pt = 2;
+    }
+    else if (pc == 0) {
+      pc = 2;
+    }
+    else if (pq == 0) {
+      pq = 2;
+    }
+
+  }
+  if (digitalRead(3) == LOW) {
+    while (digitalRead(3) == LOW) {
+      digitalWrite(9, HIGH);
+      digitalWrite(9, LOW);
+    }
+    if (pp == 0) {
+      pp = 3;
+    }
+    else if (ps == 0) {
+      ps = 3;
+    }
+    else if (pt == 0) {
+      pt = 3;
+    }
+    else if (pc == 0) {
+      pc = 3;
+    }
+    else if (pq == 0) {
+      pq = 3;
+    }
+
+  }
+  if (digitalRead(4) == LOW) {
+    while (digitalRead(4) == LOW) {
+      digitalWrite(10, HIGH);
+      digitalWrite(10, LOW);
+    }
+    if (pp == 0) {
+      pp = 4;
+    }
+    else if (ps == 0) {
+      ps = 4;
+    }
+    else if (pt == 0) {
+      pt = 4;
+    }
+    else if (pc == 0) {
+      pc = 4;
+    }
+    else if (pq == 0) {
+      pq = 4;
+    }
+  }
+  if (digitalRead(5) == LOW) {
+    while (digitalRead(5) == LOW) {
+      digitalWrite(11, HIGH);
+      digitalWrite(11, LOW);
+    }
+    if (pp == 0) {
+      pp = 5;
+    }
+    else if (ps == 0) {
+      ps = 5;
+    }
+    else if (pt == 0) {
+      pt = 5;
+    }
+    else if (pc == 0) {
+      pc = 5;
+    }
+    else if (pq == 0) {
+      pq = 5;
+    }
+  }
+  if (digitalRead(6) == LOW) {
+    while (digitalRead(6) == LOW) {
+      digitalWrite(12, HIGH);
+      digitalWrite(12, LOW);
+    }
+    if (pp == 0) {
+      pp = 6;
+    }
+    else if (ps == 0) {
+      ps = 6;
+    }
+    else if (pt == 0) {
+      pt = 6;
+    }
+    else if (pc == 0) {
+      pc = 6;
+    }
+    else if (pq == 0) {
+      pq = 6;
+    }
+  }
+
+}
+
+void inicializarVariables() {
+  p = 0;
+  s = 0;
+  t = 0;
+  c = 0;
+  q = 0;
+  pp = 0;
+  ps = 0;
+  pt = 0;
+  pc = 0;
+  pq = 0;
+}
