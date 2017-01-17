@@ -1,15 +1,16 @@
 #El famoso juego de recordar secuencias de Simon en versión arduino
 #-----Hecho por Daniel6jas-----
-
-int p, s, t, c, q; #Estas variables hacen referencia a primero, segundo ... quinto
-int pp = 0, ps = 0, pt = 0, pc = 0, pq = 0; #primero pulsar, segundo pulsar ... quinto pulsar
+int p, s, t, c, q;                    //Variables para guardar el orden de los leds de la secuencia p=primero, s=segundo, etc.
+int pp, ps, pt, pc, pq;               //Variables para guardar el orden en los que se pulsan los botones pp=pulsado primero, ps=pulsado segundo, etc.
 int TiempoEspera = 1000;
 int puntuacion = 0;
 int ronda = 1;
-int tiempoPre = 0;
-int tiempoPost = 0;
-int tiempoRonda = 0;
-void setup() {
+int tiempoPre;
+int tiempoPost;
+int tiempoRonda;
+int start=0;
+
+void setup() {           //Boton <-> Led
   pinMode(2, INPUT_PULLUP); // 2 <-> 8
   pinMode(3, INPUT_PULLUP); // 3 <-> 9
   pinMode(4, INPUT_PULLUP); // 4 <-> 10
@@ -25,15 +26,24 @@ void setup() {
 
 void loop() {
 
-  //probarLuces();
+  //probarLuces();                                      //Para probar que los leds y los botones están bien conectados
 
   inicializarVariables();
-  darValorLuces();
-  encenderLed(p);
-  encenderLed(s);
-  encenderLed(t);
-  encenderLed(c);
-  encenderLed(q);
+  secuenciaInicial();
+ 
+  Serial.println("Pulsa una tecla para empezar");
+  while (digitalRead(2) == HIGH && digitalRead(3) == HIGH && digitalRead(4) == HIGH && digitalRead(5) == HIGH && digitalRead(6) == HIGH && start==0){
+    } 
+  start=1;
+  delay(750);
+  
+  darValorLuces();                //Genera la secuencia a repetir
+  encenderLed(p, ronda);                 //Muestra la secuencia
+  encenderLed(s, ronda);
+  encenderLed(t, ronda);
+  encenderLed(c, ronda);
+  encenderLed(q, ronda);
+  
   tiempoPre = millis();
   while (pp == 0 || ps == 0 || pt == 0 || pc == 0 || pq == 0) {
     pulsarBotones();
@@ -44,13 +54,16 @@ void loop() {
 
   // VER SI HA GANADO O PERDIDO
   if ((pp + 6) == p && (ps + 6) == s && (pt + 6) == t && (pc + 6) == c && (pq + 6) == q) {
-    Serial.println("Has ganado");
+    Serial.println("Has acertado");
     puntuacion = puntuacion + (100 + 10 * ronda - tiempoRonda );
     Serial.println(puntuacion);
   }
   else {
     Serial.print("Has perdido. Tu puntuacion ha sido: ");
     Serial.print(puntuacion);
+    delay(5000);
+    puntuacion = 0;
+    start=0;
   }
   ronda++;
   delay(1000);
@@ -111,122 +124,24 @@ void darValorLuces () {
     q = (random(0, 5) + 8);
   }
 }
-void encenderLed(int i) {
+void encenderLed(int i, int r) {
   digitalWrite(i, HIGH);
-  delay(TiempoEspera);
+  if (r<6){
+  delay(TiempoEspera - r*100);
+    }
+  else{
+  delay(TiempoEspera - 500);  
+    }
   digitalWrite(i, LOW);
   delay(TiempoEspera / 2);
 }
 
 void pulsarBotones() {
-  if (digitalRead(2) == LOW) {
-    while (digitalRead(2) == LOW) {
-      digitalWrite(8, HIGH);
-      digitalWrite(8, LOW);
-    }
-    if (pp == 0) {
-      pp = 2;
-    }
-    else if (ps == 0) {
-      ps = 2;
-    }
-    else if (pt == 0) {
-      pt = 2;
-    }
-    else if (pc == 0) {
-      pc = 2;
-    }
-    else if (pq == 0) {
-      pq = 2;
-    }
-
-  }
-  if (digitalRead(3) == LOW) {
-    while (digitalRead(3) == LOW) {
-      digitalWrite(9, HIGH);
-      digitalWrite(9, LOW);
-    }
-    if (pp == 0) {
-      pp = 3;
-    }
-    else if (ps == 0) {
-      ps = 3;
-    }
-    else if (pt == 0) {
-      pt = 3;
-    }
-    else if (pc == 0) {
-      pc = 3;
-    }
-    else if (pq == 0) {
-      pq = 3;
-    }
-
-  }
-  if (digitalRead(4) == LOW) {
-    while (digitalRead(4) == LOW) {
-      digitalWrite(10, HIGH);
-      digitalWrite(10, LOW);
-    }
-    if (pp == 0) {
-      pp = 4;
-    }
-    else if (ps == 0) {
-      ps = 4;
-    }
-    else if (pt == 0) {
-      pt = 4;
-    }
-    else if (pc == 0) {
-      pc = 4;
-    }
-    else if (pq == 0) {
-      pq = 4;
-    }
-  }
-  if (digitalRead(5) == LOW) {
-    while (digitalRead(5) == LOW) {
-      digitalWrite(11, HIGH);
-      digitalWrite(11, LOW);
-    }
-    if (pp == 0) {
-      pp = 5;
-    }
-    else if (ps == 0) {
-      ps = 5;
-    }
-    else if (pt == 0) {
-      pt = 5;
-    }
-    else if (pc == 0) {
-      pc = 5;
-    }
-    else if (pq == 0) {
-      pq = 5;
-    }
-  }
-  if (digitalRead(6) == LOW) {
-    while (digitalRead(6) == LOW) {
-      digitalWrite(12, HIGH);
-      digitalWrite(12, LOW);
-    }
-    if (pp == 0) {
-      pp = 6;
-    }
-    else if (ps == 0) {
-      ps = 6;
-    }
-    else if (pt == 0) {
-      pt = 6;
-    }
-    else if (pc == 0) {
-      pc = 6;
-    }
-    else if (pq == 0) {
-      pq = 6;
-    }
-  }
-
+  pulsarBoton(2);
+  pulsarBoton(3);
+  pulsarBoton(4);
+  pulsarBoton(5);
+  pulsarBoton(6);
 }
 
 void inicializarVariables() {
@@ -240,4 +155,50 @@ void inicializarVariables() {
   pt = 0;
   pc = 0;
   pq = 0;
+  tiempoPre = 0;
+  tiempoPost = 0;
+  tiempoRonda = 0;
+}
+
+void secuenciaInicial() {
+  
+    delay(500);
+    digitalWrite(12, HIGH);
+    digitalWrite(11, HIGH);
+    digitalWrite(10, HIGH);
+    digitalWrite(9, HIGH);
+    digitalWrite(8, HIGH);
+    delay(1500);
+    digitalWrite(12, LOW);
+    digitalWrite(11, LOW);
+    digitalWrite(10, LOW);
+    digitalWrite(9, LOW);
+    digitalWrite(8, LOW);
+    
+}
+
+void pulsarBoton(int i){
+  
+  if (digitalRead(i) == LOW) {
+    while (digitalRead(i) == LOW) {
+      digitalWrite(i+6, HIGH);
+      digitalWrite(i+6, LOW);
+    }
+    if (pp == 0) {
+      pp = i;
+    }
+    else if (ps == 0) {
+      ps = i;
+    }
+    else if (pt == 0) {
+      pt = i;
+    }
+    else if (pc == 0) {
+      pc = i;
+    }
+    else if (pq == 0) {
+      pq = i;
+    }
+
+  }
 }
